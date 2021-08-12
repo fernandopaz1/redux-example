@@ -8,6 +8,7 @@ const dataInicial = {
 
 // defino los types de las actions con constantes
 const OBTNENER_POKEMONES_EXITO = 'OBTNENER_POKEMONES_EXITO'
+const ELIMINAR_POKEMONES_EXITO = 'ELIMINAR_POKEMONES_EXITO'
 
 // reducer 
 // el reducer segun las acciones que se ejecuten toma la informacion
@@ -20,6 +21,8 @@ export default function pokesReducer(state = dataInicial, action){
     switch(action.type){
         case OBTNENER_POKEMONES_EXITO:
             return {...state, array: action.payload}
+        case ELIMINAR_POKEMONES_EXITO:
+            return {array: []}
         default:
             return state
 
@@ -33,11 +36,19 @@ export default function pokesReducer(state = dataInicial, action){
 // llama al reducer con el tipo de accion exitoso
 // y le paso lo que obtuvimos de la api
 export const obtenerPokemonesAccion = () => async (dispatch, getState) => {
-        try {
-            const res = await axios.get('https://pokeapi.co/api/v2/pokemon?offset=0&limit=20')
-            dispatch({type: OBTNENER_POKEMONES_EXITO,
-                    payload: res.data.results})
-        } catch (error) {
-            console.log(error)
-        }
+    try {
+        const res = await axios.get('https://pokeapi.co/api/v2/pokemon?offset=0&limit=20')
+        dispatch({type: OBTNENER_POKEMONES_EXITO,
+                payload: res.data.results})
+    } catch (error) {
+        console.log(error)
     }
+}
+
+export const eliminarPokemonesAccion = () => async (dispatch, getState) => {
+    try {
+        dispatch({type: ELIMINAR_POKEMONES_EXITO})
+    } catch (error) {
+        console.log(error)
+    }
+}

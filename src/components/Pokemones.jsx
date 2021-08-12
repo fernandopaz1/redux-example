@@ -5,7 +5,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 // importamos las acciones que queremos usar
-import { obtenerPokemonesAccion } from '../redux/pokeDucks'
+import { obtenerPokemonesAccion, eliminarPokemonesAccion } from '../redux/pokeDucks'
 
 const Pokemones = () => {
 
@@ -16,6 +16,7 @@ const Pokemones = () => {
     return (
         <div>
             Lista de pokemones <button onClick={()=> {dispatch(obtenerPokemonesAccion())}}> Obtener Pokemones</button>
+            <button onClick={()=> {dispatch(eliminarPokemonesAccion())}}> Eliminar Pokemones</button>
             {pokemones.length > 0 ?  (<ul>
                 { pokemones.map(item => (<li key={item.name}>{item.name}</li>))}
             </ul>): <div/>}
