@@ -3,7 +3,7 @@ import axios from 'axios';
 // constantes
 // aca se guardan la informacion de los pokemones
 const dataInicial = {
-    array: ['charmander']
+    array: []
 }
 
 // defino los types de las actions con constantes

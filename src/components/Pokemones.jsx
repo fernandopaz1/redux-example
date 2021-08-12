@@ -11,10 +11,14 @@ const Pokemones = () => {
 
     const dispatch = useDispatch();
 
-    return (
-        <div onClick={()=> {dispatch(obtenerPokemonesAccion())}}>
-            Lista de pokemones
+    const pokemones = useSelector(store => store.pokemones.array)
 
+    return (
+        <div>
+            Lista de pokemones <button onClick={()=> {dispatch(obtenerPokemonesAccion())}}> Obtener Pokemones</button>
+            {pokemones.length > 0 ?  (<ul>
+                { pokemones.map(item => (<li key={item.name}>{item.name}</li>))}
+            </ul>): <div/>}
         </div>
     )
 }
