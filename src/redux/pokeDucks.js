@@ -6,11 +6,14 @@ const dataInicial = {
     array: [],
     offset: 0,
     limit: 20,
+    pagina: 0,
 }
 
 // defino los types de las actions con constantes
 const OBTNENER_POKEMONES_EXITO = 'OBTNENER_POKEMONES_EXITO'
 const SIGUIENTE_POKEMONES_EXITO = 'SIGUIENTE_POKEMONES_EXITO'
+const ANTERIOR_POKEMONES_EXITO = 'ANTERIOR_POKEMONES_EXITO'
+const ELIMINAR_POKEMONES_EXITO = 'ELIMINAR_POKEMONES_EXITO'
 
 // reducer 
 // el reducer segun las acciones que se ejecuten toma la informacion
@@ -22,11 +25,13 @@ export default function pokesReducer(state = dataInicial, action){
     // y hago append de los que me mandan en el payload
     switch(action.type){
         case OBTNENER_POKEMONES_EXITO:
-            return {...state, array: action.payload}
+            return {...state, array: action.payload.array, limit: action.payload.limit, paging: action.payload.pagina}
         case ELIMINAR_POKEMONES_EXITO:
-            return {array: []}
+            return {array: [], offset: 0, pagina: 0, limit: 20}
         case SIGUIENTE_POKEMONES_EXITO:
-            return {...state, array: action.payload, offset: action.payload.offset}
+            return {array: action.payload.array, offset: action.payload.offset, pagina: action.payload.pagina, limit: 20 }
+        case ANTERIOR_POKEMONES_EXITO:
+            return {array: action.payload.array, offset: action.payload.offset,pagina: action.payload.pagina, limit: 20}
         default:
             return state
 
@@ -40,13 +45,16 @@ export default function pokesReducer(state = dataInicial, action){
 // llama al reducer con el tipo de accion exitoso
 // y le paso lo que obtuvimos de la api
 export const obtenerPokemonesAccion = () => async (dispatch, getState) => {
-    const offset = getState().pokemones.offset
+    // const offset = getState().pokemones.offset
+    // const limit = getState().pokemones.limit
     const limit = getState().pokemones.limit
-    const siguiente = offset + limit
-    try {
+    const pagina = getState().pokemones.pagina
+    const offset = pagina*limit
+    const nextPage = pagina === 0 ? 1 : pagina;
+    try {   
         const res = await axios.get(`https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=${limit}`)
         dispatch({type: OBTNENER_POKEMONES_EXITO,
-                payload: res.data.results})
+                payload: {array: res.data.results, pagina: nextPage, limit: limit}})
     } catch (error) {
         console.log(error)
     }
@@ -62,13 +70,31 @@ export const eliminarPokemonesAccion = () => async (dispatch, getState) => {
 }
 
 export const siguientePokemonAccion = () => async (dispatch, getState) => {
-    const offset = getState().pokemones.offset
+    // const offset = getState().pokemones.offset
     const limit = getState().pokemones.limit
+    const pagina = getState().pokemones.pagina+1
+    const offset = pagina*limit
     const siguiente = offset + limit
     try {
         const res = await axios.get(`https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=${limit}`)
         dispatch({type: SIGUIENTE_POKEMONES_EXITO,
-            payload: {array: res.data.results, offset: siguiente}})
+            payload: {array: res.data.results, offset: siguiente,  pagina: pagina}})
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export const anteriorPokemonAccion = () => async (dispatch, getState) => {
+    // const offset = getState().pokemones.offset
+    const limit = getState().pokemones.limit
+    const pagina = getState().pokemones.pagina
+    const nextPage = pagina === 0 ? 0 : pagina - 1
+    const offset = limit*nextPage
+    const siguiente = offset + limit
+    try {
+        const res = await axios.get(`https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=${limit}`)
+        dispatch({type: ANTERIOR_POKEMONES_EXITO,
+            payload: {array: res.data.results, offset: siguiente,  pagina: nextPage}})
     } catch (error) {
         console.error(error)
     }
